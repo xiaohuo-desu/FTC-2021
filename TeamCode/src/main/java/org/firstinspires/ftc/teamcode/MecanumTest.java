@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
@@ -26,6 +27,15 @@ public class MecanumTest extends LinearOpMode {
 
     double Maxspeed=1;
 
+    DcMotor rolling;
+    DcMotor arm;
+
+    Servo catching;
+
+    public enum Catch{
+        Open,Close
+    }
+
     @Override
     public void runOpMode() throws InterruptedException {
 
@@ -33,6 +43,11 @@ public class MecanumTest extends LinearOpMode {
         Leftback = hardwareMap.get(DcMotorEx.class,"LeftBack");
         Rightfront = hardwareMap.get(DcMotorEx.class,"RightFront");
         Leftfront = hardwareMap.get(DcMotorEx.class,"LeftFront");
+
+        rolling=hardwareMap.get(DcMotor.class,"rolling");
+        arm=hardwareMap.get(DcMotor.class,"arm");
+
+        catching=hardwareMap.get(Servo.class,"catching");
 
         Leftfront.setDirection(DcMotorSimple.Direction.FORWARD);
         Rightfront.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -47,6 +62,8 @@ public class MecanumTest extends LinearOpMode {
         Leftback.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         Rightback.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         Rightback.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        catching.scaleRange(0,0.6);
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -103,6 +120,20 @@ public class MecanumTest extends LinearOpMode {
             Rightfront.setPower(frm);
             Leftback.setPower(blm);
             Rightback.setPower(brm);
+
+            //机械臂
+            arm.setPower(gamepad1.left_trigger);
+            arm.setPower(-gamepad1.right_trigger);
+            //转盘
+            if(gamepad1.right_bumper){
+                rolling.setPower(0.5);
+            }
+            else {
+                rolling.setPower(0);
+            }
+            //爪子
+
+            switch ()
 
         }
     }
