@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package teamcode;
 
 import android.os.Debug;
 
@@ -29,8 +29,8 @@ public class FTCTeleOp extends LinearOpMode {
     double position=0.6;
     double startPosition;
 
-    int MinEleposition;
-
+    double ElevatorPower;
+    double ElevatorPosition;
     double Deltime;
 
     boolean Isload=true;
@@ -100,32 +100,31 @@ public class FTCTeleOp extends LinearOpMode {
             PID(M4,Rightback);
 
             //翻斗
-                if(gamepad1.b)
-                {
-                    Claw.setPosition(position);
-                    sleep(1500);
-                    Claw.setPosition(startPosition);
-                    Deltime=0;
-                }
+            if(gamepad1.b)
+            {
+                Claw.setPosition(position);
+                sleep(1500);
+                Claw.setPosition(startPosition);
+                Deltime=0;
+            }
 
             //升降
 
             double ElePowerUp=gamepad1.left_trigger;
-                if(ElePowerUp!=0&&Claw.getPosition()==startPosition&&Isload==true){
-                    Deltime+=PIDTimer.time();
-                    if(Deltime>100)
-                    {
-                        Claw.setPosition(0.2);
-                        Isload=false;
-                    }
+            if(ElePowerUp!=0&&Claw.getPosition()==startPosition&&Isload==true){
+                Deltime+=PIDTimer.time();
+                if(Deltime>100)
+                {
+                    Claw.setPosition(0.2);
+                    Isload=false;
                 }
-
+            }
             double ElePowerDown=-gamepad1.right_trigger;
-                if(ElePowerDown!=0){
-                    Isload=true;
-                }
+            if(ElePowerDown!=0){
+                Isload=true;
+            }
 
-            Elevator.setPower((ElePowerUp+ElePowerDown)*0.5);
+
 
             //转盘
 
@@ -147,6 +146,27 @@ public class FTCTeleOp extends LinearOpMode {
             {
                 Cubecatcher.setVelocity(0);
             }
+            //读取抬升数值
+            ElevatorPower = Elevator.getPower();
+            ElevatorPosition += Elevator.getPower();
+            int limit = 5; //限位值
+
+            //限位逻辑
+
+            if(ElevatorPosition <= limit) //如果达到限制
+            {
+                Elevator.setPower((ElePowerUp+ElePowerDown)*0.5); //正常抬升
+            }
+            else
+            {
+                Elevator.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE); //强制制动，停止移动
+                Elevator.setPower((ElePowerDown)*0.5); //仅允许向下
+            }
+
+            //数值显示测试
+            telemetry.addData("抬升器数值（获取Power）：",ElevatorPower);
+            telemetry.addData("抬升器相对位置：",ElevatorPosition);
+            telemetry.addData("start position",startPosition);
         }
     }
 
@@ -174,7 +194,6 @@ public class FTCTeleOp extends LinearOpMode {
     }
 
 }
-
 
 
 

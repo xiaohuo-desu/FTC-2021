@@ -20,7 +20,9 @@ public class TestOpMode extends LinearOpMode {
     DcMotor M3;
     DcMotor M4;
 
-    Servo Testservo;
+
+
+    DcMotor rolling;
 
     double M1power,M2power,M3power,M4power;
 
@@ -30,7 +32,8 @@ public class TestOpMode extends LinearOpMode {
 
         double position=0.5;
 
-        Testservo=hardwareMap.servo.get("Holder");
+
+        rolling=hardwareMap.get(DcMotor.class,"rolling");
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -42,15 +45,15 @@ public class TestOpMode extends LinearOpMode {
             telemetry.addData("Status", "Running");
             telemetry.update();
 
+            rolling.setPower(1);
 
 
 
-            if(gamepad1.b){
-                Testservo.setPosition(0.6);
-                //position=position+0.5;
+
+
             }
 
 
         }
     }
-}
+
