@@ -4,42 +4,46 @@ import android.hardware.Sensor;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.PIDCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
-@TeleOp(name="MecanumTeleOp19")
-public class MecanumTest extends LinearOpMode {
+@TeleOp(name="Car2")
+public class Car2 extends LinearOpMode {
 
     DcMotorEx Leftfront;
     DcMotorEx Rightfront;
     DcMotorEx Leftback;
     DcMotorEx Rightback;
 
-    double Left_stick_x;
-    double Left_stick_y;
-    double power;
-
-    double angle;
-
     double flm,frm,blm,brm;
 
-    double Maxspeed=1;
+    double Maxspeed=800;
 
     DcMotor rolling;
     DcMotorEx arm;
 
-    Servo catching;
+    CRServo catching;
 
     TouchSensor touchSensor;
 
     public enum Catch{
         Open,Close
     }
+
+    public static PIDCoefficients pidCoeffs=new PIDCoefficients(0.6,0,0);
+    public  PIDCoefficients pidGains= new PIDCoefficients(0,0,0);
+
+    ElapsedTime PIDTimer= new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+
+
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -54,7 +58,7 @@ public class MecanumTest extends LinearOpMode {
         rolling=hardwareMap.get(DcMotor.class,"rolling");
         arm=hardwareMap.get(DcMotorEx.class,"arm");
 
-        catching=hardwareMap.get(Servo.class,"catching");
+        catching=hardwareMap.get(CRServo.class,"catching");
 
         //touchSensor=hardwareMap.get(TouchSensor.class,"TouchSensor");
 
@@ -75,7 +79,7 @@ public class MecanumTest extends LinearOpMode {
         arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        catching.scaleRange(0,0.6);
+
 
         //if(!touchSensor.isPressed()){
            // arm.setVelocity(-800);
@@ -96,59 +100,31 @@ public class MecanumTest extends LinearOpMode {
 
             arm.setMotorEnable();
 
-            Left_stick_x=gamepad1.left_stick_x;
-            Left_stick_y=gamepad1.left_stick_y;
+            flm= (-gamepad1.left_stick_y+gamepad1.left_stick_x+(gamepad1.right_stick_x/2))*Maxspeed;
+            frm= (-gamepad1.left_stick_y-gamepad1.left_stick_x-(gamepad1.right_stick_x/2))*Maxspeed;
+            blm= (-gamepad1.left_stick_y-gamepad1.left_stick_x+(gamepad1.right_stick_x/2))*Maxspeed;
+            brm= (-gamepad1.left_stick_y+gamepad1.left_stick_x-(gamepad1.right_stick_x/2))*Maxspeed;
 
-            angle=Math.atan2(Left_stick_x,Left_stick_y);
-
-            power=Math.sqrt(Math.pow(Left_stick_x+Left_stick_y,2));
-
-            double radiantodirection=Math.toRadians(angle);
-
-            flm=(Math.cos(radiantodirection+Math.sin(radiantodirection)))*power;
-            frm=(Math.cos(radiantodirection-Math.sin(radiantodirection)))*power;
-            blm=(Math.cos(radiantodirection-Math.sin(radiantodirection)))*power;
-            brm=(Math.cos(radiantodirection+Math.sin(radiantodirection)))*power;
-
-            double powerreducer=1;
-
-            double [] numbers={flm,frm,blm,brm};
-
-            Arrays.sort(numbers);
-
-            double min=numbers[0];
-            double max=numbers[numbers.length-1];
-
-            if((Math.abs(max)>Maxspeed)||(Math.abs(min)>Maxspeed)){
-                if(Math.abs(max)>=Math.abs(min)){
-                    powerreducer=(Maxspeed/max);
-                }else{
-                    powerreducer=(Maxspeed/Math.abs(min));
-                }
-            }
-
-            flm=flm*powerreducer;
-            frm=flm*powerreducer;
-            blm=flm*powerreducer;
-            brm=flm*powerreducer;
-
-            flm=Math.round(flm*1000.0)/1000.0;
-            frm=Math.round(flm*1000.0)/1000.0;
-            blm=Math.round(flm*1000.0)/1000.0;
-            brm=Math.round(flm*1000.0)/1000.0;
-
-            Leftfront.setPower(flm*0.5);
-            Rightfront.setPower(frm*0.5);
-            Leftback.setPower(blm*0.5);
-            Rightback.setPower(brm*0.5);
+            PID(flm,Leftfront);
+            PID(frm,Rightfront);
+            PID(blm,Leftback);
+            PID(brm,Rightback);
 
             //机械臂
-            double Left_trigger=gamepad1.left_trigger*500;
-            double Right_trigger=-gamepad1.right_trigger*500;
-            arm.setVelocity(3000+Left_trigger+Right_trigger);
+            arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
+            if(gamepad1.left_trigger!=0){
+                arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+                arm.setDirection(DcMotorSimple.Direction.REVERSE);
+                arm.setPower(gamepad1.left_trigger);
+            }
+            else if(gamepad1.right_trigger!=0)
+            {
+                arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+                arm.setDirection(DcMotorSimple.Direction.FORWARD);
+                arm.setPower(gamepad1.right_trigger);
+            }
             //转盘
-
             if(gamepad1.right_bumper){
                 rolling.setPower(0.5);
             }
@@ -156,20 +132,55 @@ public class MecanumTest extends LinearOpMode {
                 rolling.setPower(0);
             }
             //爪子
+
+            double closeTime=50;
+
             switch (cath)
             {
                 case Open:
-                    if(gamepad1.b)
-                        catching.setPosition(0.6);
-                    cath=Catch.Close;
+                    if(gamepad1.b){
+                        catching.setPower(0.3);
+                        while(closeTime!=0){
+                            closeTime--;
+                        }
+                        cath=Catch.Close;
+                        closeTime=50;
+                    }
                     break;
                 case Close:
-                    if(gamepad1.b)
-                        catching.setPosition(0);
-                    cath=Catch.Open;
+                    if(gamepad1.b) {
+                        catching.setPower(-0.3);
+                        while (closeTime!= 0) {
+                            closeTime--;
+                        }
+                        cath=Catch.Open;
+                        closeTime=50;
+                    }
                     break;
             }
-
         }
+    }
+
+    double intergral= 0;
+    double LastError=0;
+    public void PID(double targetVelocity,DcMotorEx targetMotor)
+    {
+        PIDTimer.reset();
+
+        double currentVelocity=targetMotor.getVelocity();
+        double error= targetVelocity-currentVelocity;
+
+        intergral+=error*PIDTimer.time();
+        double deltaError=error-LastError;
+        double derivative = deltaError/PIDTimer.time();  //the rate of change
+
+        pidGains.p= pidCoeffs.p*error;
+        pidGains.i=pidCoeffs.i*intergral;
+        pidGains.d=pidCoeffs.d*derivative;
+
+        targetMotor.setVelocity(pidGains.p+ pidGains.i+ pidGains.d+targetVelocity);
+
+        LastError=error;
+
     }
 }
