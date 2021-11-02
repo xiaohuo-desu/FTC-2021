@@ -83,7 +83,7 @@ public class FTCTeleOp extends LinearOpMode {
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
-
+        telemetry.addData("测试","测试");
 
         waitForStart();
 
