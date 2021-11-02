@@ -81,6 +81,7 @@ public class FTCTeleOp extends LinearOpMode {
         startPosition=Claw.getPosition();
         Deltime=0;
 
+        int times = 0;
         waitForStart();
 
         while (opModeIsActive()) {
@@ -153,20 +154,42 @@ public class FTCTeleOp extends LinearOpMode {
 
             //限位逻辑
 
-            if(ElevatorPosition <= limit) //如果达到限制
+
+            int InitElevatorLimit = 2;
+            if(times == 0)
             {
-                Elevator.setPower((ElePowerUp+ElePowerDown)*0.5); //正常抬升
+                InitElevatorLimit = 1;
             }
-            else
+
+            switch(InitElevatorLimit)
             {
-                Elevator.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE); //强制制动，停止移动
-                Elevator.setPower((ElePowerDown)*0.5); //仅允许向下
+                case 1:
+                    Elevator.setPower((ElePowerUp)*0.5); //仅允许向上
+                    break;
+                case 2:
+                    if(ElevatorPosition <= limit) //如果达到限制
+                    {
+                        Elevator.setPower((ElePowerUp+ElePowerDown)*0.5); //正常抬升
+                    }
+                    else
+                    {
+                        Elevator.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE); //强制制动，停止移动
+                        Elevator.setPower((ElePowerDown)*0.5); //仅允许向下
+                        times = 1;
+                    }
+                    break;
+                default:
+                    break;
             }
+
+
+
 
             //数值显示测试
             telemetry.addData("抬升器数值（获取Power）：",ElevatorPower);
             telemetry.addData("抬升器相对位置：",ElevatorPosition);
             telemetry.addData("start position",startPosition);
+            telemetry.addData("InitElevatorLimit",InitElevatorLimit);
         }
     }
 
