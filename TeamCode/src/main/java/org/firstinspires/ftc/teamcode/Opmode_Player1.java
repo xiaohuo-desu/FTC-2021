@@ -6,9 +6,17 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.PIDCoefficients;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.hardware.bosch.BNO055IMU;
 
-@TeleOp(name="19851TeleOp")
-public class Opmode extends LinearOpMode {
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
+import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
+
+@TeleOp(name="19851TeleOp_Player1")
+public class Opmode_Player1 extends LinearOpMode {
 
     double M1,M2,M3,M4;
     double MotorMaxspeed=0.8;
@@ -19,12 +27,18 @@ public class Opmode extends LinearOpMode {
 
     boolean Isload=true;
 
+    BNO055IMU               imu;
+    Orientation             lastAngles = new Orientation();
+    double                  globalAngle;
+
     public static PIDCoefficients pidCoeffs=new PIDCoefficients(0.6,0,0);
     public  PIDCoefficients pidGains= new PIDCoefficients(0,0,0);
 
     ElapsedTime PIDTimer= new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
 
     Hardwaremap telehwp = new Hardwaremap();
+
+    Velocity v;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -40,6 +54,22 @@ public class Opmode extends LinearOpMode {
         telehwp.Rightfront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         telehwp.Rightback.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+
+        parameters.mode                = BNO055IMU.SensorMode.IMU;
+        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.loggingEnabled      = false;
+
+        // Retrieve and initialize the IMU. We expect the IMU to be attached to an I2C port
+        // on a Core Device Interface Module, configured to be a sensor of type "AdaFruit IMU",
+        // and named "imu".
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+
+        imu.initialize(parameters);
+
+        resetAngle();
+
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
@@ -47,12 +77,21 @@ public class Opmode extends LinearOpMode {
 
         while (opModeIsActive()) {
 
+            getAngle();
+
+            imu.startAccelerationIntegration(imu.getPosition(), v,1);
+
             telemetry.addData("Status", "Running");
+            telemetry.addData("1 imu heading", lastAngles.firstAngle);
+            telemetry.addData("2 global heading", globalAngle);
+            telemetry.addData("Velocity",imu.getVelocity());
+            telemetry.addData("position",imu.getPosition());
             telemetry.update();
+
             //start+A键为gamepad1    start+B键为gamepad2
             //手柄中上拨为-1，下拨为1
-            M1= (gamepad1.left_stick_y-gamepad1.left_stick_x-(gamepad1.right_stick_x/2))*MotorMaxspeed;
-            M2= (gamepad1.left_stick_y+gamepad1.left_stick_x+(gamepad1.right_stick_x/2))*MotorMaxspeed;
+            M1= (-gamepad1.left_stick_y-gamepad1.left_stick_x-(gamepad1.right_stick_x/2))*MotorMaxspeed;
+            M2= (-gamepad1.left_stick_y+gamepad1.left_stick_x+(gamepad1.right_stick_x/2))*MotorMaxspeed;
             M3= (-gamepad1.left_stick_y+gamepad1.left_stick_x-(gamepad1.right_stick_x/2))*MotorMaxspeed;
             M4= (-gamepad1.left_stick_y-gamepad1.left_stick_x+(gamepad1.right_stick_x/2))*MotorMaxspeed;
 
@@ -67,7 +106,7 @@ public class Opmode extends LinearOpMode {
             PID(M4,telehwp.Rightback);*/
 
             //翻斗
-            if(gamepad1.b)
+            /*if(gamepad1.b)
             {
                 telehwp.Claw.setPosition(position);
                 sleep(1500);
@@ -119,7 +158,7 @@ public class Opmode extends LinearOpMode {
 
             //数值显示测试
 
-            telemetry.addData("start position",startPosition);
+            telemetry.addData("start position",startPosition);*/
         }
     }
 
@@ -144,5 +183,37 @@ public class Opmode extends LinearOpMode {
 
         LastError=error;
     }
+
+    private void resetAngle()
+    {
+        lastAngles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+
+        globalAngle = 0;
+    }
+
+    private double getAngle()
+    {
+        // We experimentally determined the Z axis is the axis we want to use for heading angle.
+        // We have to process the angle because the imu works in euler angles so the Z axis is
+        // returned as 0 to +180 or 0 to -180 rolling back to -179 or +179 when rotation passes
+        // 180 degrees. We detect this transition and track the total cumulative angle of rotation.
+
+        Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+
+        double deltaAngle = angles.firstAngle - lastAngles.firstAngle;
+
+        if (deltaAngle < -180)
+            deltaAngle += 360;
+        else if (deltaAngle > 180)
+            deltaAngle -= 360;
+
+        globalAngle += deltaAngle;
+
+        lastAngles = angles;
+
+        return globalAngle;
+    }
+
+
 
 }

@@ -12,8 +12,8 @@ public class Hardwaremap {
     DcMotorEx Leftback=null; //2
     DcMotorEx Rightback=null; //3
     DcMotorEx Elevator=null;
+    DcMotorEx Base=null;
     DcMotor Rolling=null;
-    DcMotorEx Cubecatcher=null;
     Servo Claw=null;
 
     HardwareMap hwp=null;
@@ -28,8 +28,8 @@ public class Hardwaremap {
         Rightfront = hwp.get(DcMotorEx.class, "RightFront");
         Leftfront = hwp.get(DcMotorEx.class, "LeftFront");
         Elevator=hwp.get(DcMotorEx.class,"Elevator");
+        Base=hwp.get(DcMotorEx.class,"Base");
         Rolling=hwp.dcMotor.get("Rolling");
-        Cubecatcher=hwp.get(DcMotorEx.class,"CatchCube");
         Claw = hwp.servo.get(("Holder"));
 
         Leftfront.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -42,7 +42,8 @@ public class Hardwaremap {
         Rightfront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         Leftback.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         Rightback.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        Elevator.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        Elevator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        Base.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         Rolling.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 }
