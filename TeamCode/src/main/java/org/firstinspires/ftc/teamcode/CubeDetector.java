@@ -23,6 +23,7 @@ public class CubeDetector extends OpenCvPipeline {
     }
     private Location location;
 
+    //TODO 调整方框至鸭子身体部分
     static final Rect LEFT_ROI = new Rect(
             new Point(60, 330),
             new Point(240, 460));
@@ -39,15 +40,15 @@ public class CubeDetector extends OpenCvPipeline {
     @Override
     public Mat processFrame(Mat input) {
 
-        //tool.getMat(input);
-        //contoursRemoveNoise(1);
-
         Imgproc.cvtColor(input, mat, Imgproc.COLOR_RGB2HSV);
+        //TODO 调整颜色范围
+
         Scalar lowHSV = new Scalar(23,70,70);
         Scalar highHSV = new Scalar(34, 255, 255);
 
         Core.inRange(mat, lowHSV, highHSV, mat);
 
+        //识别方框内容
         Mat left = mat.submat(LEFT_ROI);
         Mat right = mat.submat(RIGHT_ROI);
         Mat middle = mat.submat(MIDDLE_ROI);
@@ -62,10 +63,12 @@ public class CubeDetector extends OpenCvPipeline {
         right.release();
         middle.release();
 
+        //Opencv左中右元数据
         telemetry.addData("Left raw value", (int) Core.sumElems(left).val[0]);
         telemetry.addData("Middle raw value", (int) Core.sumElems(middle).val[0]);
         telemetry.addData("Right raw value", (int) Core.sumElems(right).val[0]);
 
+        //转换为百分比
         telemetry.addData("Left percentage", Math.round(leftValue * 100) + "%");
         telemetry.addData("middle percentage", Math.round(middleValue * 100) + "%");
         telemetry.addData("Right percentage", Math.round(rightValue * 100) + "%");
@@ -76,19 +79,19 @@ public class CubeDetector extends OpenCvPipeline {
 
         if (stoneMiddle) {
             location = Location.MIDDLE;
-            telemetry.addData("Skystone Location", "middle");
+            telemetry.addData("鸭子的位置", "中间");
         }
         else if (stoneLeft) {
             location = Location.LEFT;
-            telemetry.addData("Skystone Location", "left");
+            telemetry.addData("鸭子的位置", "左侧");
         }
         else if(stoneRight) {
             location = Location.RIGHT;
-            telemetry.addData("Skystone Location", "right");
+            telemetry.addData("鸭子的位置", "右侧");
         }
         else {
             location = Location.UNFOUND;
-            telemetry.addData("Skystone Location", "unfound");
+            telemetry.addData("鸭子的位置", "未找到");
         }
         telemetry.update();
 
@@ -107,4 +110,10 @@ public class CubeDetector extends OpenCvPipeline {
     public Location getLocation() {
         return location;
     }
+
+    /**
+     * 连通域降噪
+     * @param pArea 默认值为1
+     */
+
 }
