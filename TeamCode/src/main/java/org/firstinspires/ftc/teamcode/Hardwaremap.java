@@ -30,12 +30,14 @@ public class Hardwaremap {
         Elevator=hwp.get(DcMotorEx.class,"Elevator");
         Base=hwp.get(DcMotorEx.class,"Base");
         Rolling=hwp.dcMotor.get("Rolling");
-        Claw = hwp.servo.get(("Holder"));
+        Claw = hwp.servo.get(("Claw"));
 
         Leftfront.setDirection(DcMotorSimple.Direction.FORWARD);
         Rightfront.setDirection(DcMotorSimple.Direction.REVERSE);
         Leftback.setDirection(DcMotorSimple.Direction.FORWARD);
         Rightback.setDirection(DcMotorSimple.Direction.REVERSE);
+        Base.setDirection(DcMotorSimple.Direction.FORWARD);
+        Elevator.setDirection(DcMotorSimple.Direction.REVERSE);
         Claw.setDirection(Servo.Direction.REVERSE);
         
         Leftfront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -45,5 +47,8 @@ public class Hardwaremap {
         Elevator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         Base.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         Rolling.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        Base.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
     }
 }

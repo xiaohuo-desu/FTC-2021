@@ -15,17 +15,18 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 
-@TeleOp(name="19851TeleOp_Player1")
-public class Opmode_Player1 extends LinearOpMode {
+@TeleOp(name="19851TeleOp_Player1+2")
+public class Opmode_Player1plus2 extends LinearOpMode {
 
     double M1,M2,M3,M4;
-    double MotorMaxspeed=0.8;
+    double MotorMaxspeed=0.7;
     double position=0.6;
     double startPosition;
 
     double Deltime;
 
     boolean Isload=true;
+    boolean isOpen;
 
     BNO055IMU               imu;
     Orientation             lastAngles = new Orientation();
@@ -53,6 +54,8 @@ public class Opmode_Player1 extends LinearOpMode {
         telehwp.Leftfront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         telehwp.Rightfront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         telehwp.Rightback.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        telehwp.Elevator.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        telehwp.Base.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
 
@@ -70,6 +73,8 @@ public class Opmode_Player1 extends LinearOpMode {
 
         resetAngle();
 
+        isOpen=false;
+
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
@@ -84,8 +89,6 @@ public class Opmode_Player1 extends LinearOpMode {
             telemetry.addData("Status", "Running");
             telemetry.addData("1 imu heading", lastAngles.firstAngle);
             telemetry.addData("2 global heading", globalAngle);
-            telemetry.addData("Velocity",imu.getVelocity());
-            telemetry.addData("position",imu.getPosition());
             telemetry.update();
 
             //start+A键为gamepad1    start+B键为gamepad2
@@ -100,65 +103,31 @@ public class Opmode_Player1 extends LinearOpMode {
             telehwp.Leftback.setPower(M3);
             telehwp.Rightback.setPower(M4);
 
-            /*PID(M1,telehwp.Leftfront);
-            PID(M2,telehwp.Rightfront);
-            PID(M3,telehwp.Leftback);
-            PID(M4,telehwp.Rightback);*/
+            //---------------Player2---------------------//
 
-            //翻斗
-            /*if(gamepad1.b)
-            {
-                telehwp.Claw.setPosition(position);
-                sleep(1500);
-                telehwp.Claw.setPosition(startPosition);
-                Deltime=0;
-            }
+            //转向
+            telehwp.Base.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            telehwp.Base.setPower(gamepad2.left_stick_x*0.3);
 
-            //升降
-            telehwp.Elevator.setPower(gamepad1.left_trigger-gamepad1.right_trigger);
-            if(gamepad1.left_trigger==0||gamepad1.right_trigger==0){
-                telehwp.Elevator.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            }
+            //抬升
+            telehwp.Elevator.setPower(gamepad2.right_stick_y);
 
-            double ElePowerUp=gamepad1.left_trigger;
-            if(ElePowerUp!=0&&telehwp.Claw.getPosition()==startPosition&&Isload==true){
-                Deltime+=PIDTimer.time();
-                if(Deltime>100)
-                {
-                    telehwp.Claw.setPosition(0.2);
-                    Isload=false;
-                }
+
+            //夹子
+            if(isOpen&&gamepad2.a){
+                telehwp.Claw.setPosition(0.3);
+                isOpen=false;
             }
-            double ElePowerDown=-gamepad1.right_trigger;
-            if(ElePowerDown!=0)
-            {
-                Isload=true;
+            if(!isOpen&&gamepad2.b){
+                telehwp.Claw.setPosition(0.7);
+                isOpen=true;
             }
 
             //转盘
-
-            if(gamepad1.left_bumper)
-            {
-                telehwp.Rolling.setPower(-0.5);
+            while (gamepad2.y){
+                telehwp.Rolling.setPower(1);
             }
-            else{
-                telehwp.Rolling.setPower(0);
-            }
-
-            //吸取
-
-            if(gamepad1.right_bumper)
-            {
-                telehwp.Cubecatcher.setPower(-1);
-            }
-            else
-            {
-                telehwp.Cubecatcher.setVelocity(0);
-            }
-
-            //数值显示测试
-
-            telemetry.addData("start position",startPosition);*/
+            telehwp.Rolling.setPower(0);
         }
     }
 
@@ -213,7 +182,5 @@ public class Opmode_Player1 extends LinearOpMode {
 
         return globalAngle;
     }
-
-
 
 }

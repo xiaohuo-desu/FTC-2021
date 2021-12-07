@@ -26,7 +26,10 @@ public class AutoRedsideRight extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         autohwp.init(hardwareMap);
         waitForStart();
-        // -左前，-右前，+右后，+左后为前行
+        ElevatorDrive(200,-600);
+        sleep(200);
+       ElevatorDrive(200,0 );
+       /* // -左前，-右前，+右后，+左后为前行
         encoderDrive(DRIVE_SPEED,-21,21,-21,21,5);//右平移
         encoderDrive(DRIVE_SPEED,17,17,-17,-17,5);//后退
         //倾倒（第一次）
@@ -35,10 +38,10 @@ public class AutoRedsideRight extends LinearOpMode {
         encoderDrive(DRIVE_SPEED,-20,20,-20,20,5);//右平移
         encoderDrive(DRIVE_SPEED,-50,-50,50,50,5);//前行
         //吸取
-        autohwp.Cubecatcher.setPower(-1);
+
         encoderDrive(100,-5,-5,5,5,5);//前行
         sleep(1000);
-        autohwp.Cubecatcher.setPower(0);
+
         encoderDrive(DRIVE_SPEED,56,56,-56,-56,5);//后退
         encoderDrive(DRIVE_SPEED,5,-5,5,-5,5);//左平移
         encoderDrive(DRIVE_SPEED,-13,13,13,-13,5);//右转
@@ -50,10 +53,10 @@ public class AutoRedsideRight extends LinearOpMode {
         encoderDrive(DRIVE_SPEED,-20,20,-20,20,5);//右平移
         encoderDrive(DRIVE_SPEED,-55,-55,55,55,5);//前行
         //吸取
-        autohwp.Cubecatcher.setPower(-1);
+
         encoderDrive(100,-5,-5,5,5,5);//前行
         sleep(1000);
-        autohwp.Cubecatcher.setPower(0);
+
         encoderDrive(DRIVE_SPEED,56,56,-56,-56,5);//后退
         encoderDrive(DRIVE_SPEED,5,-5,5,-5,5);//右平移
         encoderDrive(DRIVE_SPEED,-14,14,14,-14,5);//右转
@@ -63,7 +66,7 @@ public class AutoRedsideRight extends LinearOpMode {
         encoderDrive(DRIVE_SPEED,-5,-5,5,5,5);//前行
         encoderDrive(DRIVE_SPEED,14,-14,-14,14,5);//右转
         encoderDrive(DRIVE_SPEED,-20,20,-20,20,5);//右平移
-        encoderDrive(DRIVE_SPEED,-50,-50,50,50,5);//前行
+        encoderDrive(DRIVE_SPEED,-50,-50,50,50,5);//前行*/
 
     }
 
@@ -124,6 +127,40 @@ public class AutoRedsideRight extends LinearOpMode {
 
             sleep(50);   // optional pause after each move
         }
+    }
+
+
+    public void BaseDrive(double speed,int targetPosition){
+        autohwp.Base.setTargetPosition(targetPosition);
+        autohwp.Base.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        //if (TurnningOk)
+        autohwp.Base.setPower(speed);
+        while (autohwp.Base.isBusy()){
+            telemetry.addData("CurrentPosition",autohwp.Base.getCurrentPosition());
+            telemetry.addData("TargetPosition",autohwp.Base.getTargetPosition());
+            telemetry.update();
+        }
+        autohwp.Base.setPower(0);
+        autohwp.Base.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+    boolean TurnningOk=false;
+    public void ElevatorDrive(double speed,int targetPosition){
+        autohwp.Elevator.setTargetPosition(targetPosition);
+        autohwp.Elevator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        autohwp.Elevator.setVelocity(speed);
+        if(autohwp.Elevator.getCurrentPosition()<-400){
+            TurnningOk=true;
+        }
+        else {
+            TurnningOk=false;
+        }
+        while (autohwp.Elevator.isBusy()){
+            telemetry.addData("CurrentHeight",autohwp.Elevator.getCurrentPosition());
+            telemetry.addData("TargetHeight",autohwp.Elevator.getTargetPosition());
+            telemetry.update();
+        }
+        autohwp.Elevator.setPower(0);
+        autohwp.Elevator.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 }
 
