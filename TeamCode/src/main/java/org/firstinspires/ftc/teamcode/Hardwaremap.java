@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 
 public class Hardwaremap {
     DcMotorEx Leftfront=null; //1
@@ -15,6 +16,8 @@ public class Hardwaremap {
     DcMotorEx Base=null;
     DcMotor Rolling=null;
     Servo Claw=null;
+    TouchSensor Left_touch=null;
+    TouchSensor Right_touch=null;
 
     HardwareMap hwp=null;
 
@@ -31,14 +34,16 @@ public class Hardwaremap {
         Base=hwp.get(DcMotorEx.class,"Base");
         Rolling=hwp.dcMotor.get("Rolling");
         Claw = hwp.servo.get(("Claw"));
+        Left_touch=hwp.get(TouchSensor.class,"Lefttouch");
+        Right_touch=hwp.get(TouchSensor.class,"Righttouch");
 
         Leftfront.setDirection(DcMotorSimple.Direction.FORWARD);
         Rightfront.setDirection(DcMotorSimple.Direction.REVERSE);
         Leftback.setDirection(DcMotorSimple.Direction.FORWARD);
         Rightback.setDirection(DcMotorSimple.Direction.REVERSE);
-        Base.setDirection(DcMotorSimple.Direction.FORWARD);
+        Base.setDirection(DcMotorSimple.Direction.REVERSE);
         Elevator.setDirection(DcMotorSimple.Direction.REVERSE);
-        Claw.setDirection(Servo.Direction.REVERSE);
+        Claw.setDirection(Servo.Direction.FORWARD);
         
         Leftfront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         Rightfront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);

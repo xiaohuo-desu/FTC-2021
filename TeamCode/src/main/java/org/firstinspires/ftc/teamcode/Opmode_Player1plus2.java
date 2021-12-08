@@ -89,6 +89,7 @@ public class Opmode_Player1plus2 extends LinearOpMode {
             telemetry.addData("Status", "Running");
             telemetry.addData("1 imu heading", lastAngles.firstAngle);
             telemetry.addData("2 global heading", globalAngle);
+            telemetry.addData("Lefttouch",telehwp.Left_touch.isPressed());
             telemetry.update();
 
             //start+A键为gamepad1    start+B键为gamepad2
@@ -107,7 +108,23 @@ public class Opmode_Player1plus2 extends LinearOpMode {
 
             //转向
             telehwp.Base.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            telehwp.Base.setPower(gamepad2.left_stick_x*0.3);
+            //telehwp.Base.setPower(gamepad2.left_stick_x);
+            if(!telehwp.Left_touch.isPressed()&&!telehwp.Right_touch.isPressed()){
+                telehwp.Base.setPower(gamepad2.left_stick_x);
+            }
+            else if(telehwp.Left_touch.isPressed()){
+                if(gamepad2.left_stick_x<0)
+                    telehwp.Base.setPower(0);
+                else
+                    telehwp.Base.setPower(gamepad2.left_stick_x);
+            }
+            else {
+                if(gamepad2.left_stick_x>0)
+                    telehwp.Base.setPower(0);
+                else
+                    telehwp.Base.setPower(gamepad2.left_stick_x);
+            }
+
 
             //抬升
             telehwp.Elevator.setPower(gamepad2.right_stick_y);
@@ -115,11 +132,11 @@ public class Opmode_Player1plus2 extends LinearOpMode {
 
             //夹子
             if(isOpen&&gamepad2.a){
-                telehwp.Claw.setPosition(0.3);
+                telehwp.Claw.setPosition(0);
                 isOpen=false;
             }
             if(!isOpen&&gamepad2.b){
-                telehwp.Claw.setPosition(0.7);
+                telehwp.Claw.setPosition(0.3);
                 isOpen=true;
             }
 
