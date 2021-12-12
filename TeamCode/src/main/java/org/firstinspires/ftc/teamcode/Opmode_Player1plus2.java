@@ -108,7 +108,6 @@ public class Opmode_Player1plus2 extends LinearOpMode {
 
             //转向
             telehwp.Base.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            //telehwp.Base.setPower(gamepad2.left_stick_x);
             if(!telehwp.Left_touch.isPressed()&&!telehwp.Right_touch.isPressed()){
                 telehwp.Base.setPower(gamepad2.left_stick_x);
             }
@@ -118,17 +117,15 @@ public class Opmode_Player1plus2 extends LinearOpMode {
                 else
                     telehwp.Base.setPower(gamepad2.left_stick_x);
             }
-            else {
+            else if(telehwp.Right_touch.isPressed()){
                 if(gamepad2.left_stick_x>0)
                     telehwp.Base.setPower(0);
                 else
                     telehwp.Base.setPower(gamepad2.left_stick_x);
             }
 
-
             //抬升
             telehwp.Elevator.setPower(gamepad2.right_stick_y);
-
 
             //夹子
             if(isOpen&&gamepad2.a){

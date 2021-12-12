@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.checkerframework.checker.guieffect.qual.SafeType;
 
-@TeleOp(name = "19581TeleOp_Player2")
+//@TeleOp(name = "19581TeleOp_Player2")
 public class Opmode_Player2 extends LinearOpMode {
 
     Hardwaremap telehwp = new Hardwaremap();

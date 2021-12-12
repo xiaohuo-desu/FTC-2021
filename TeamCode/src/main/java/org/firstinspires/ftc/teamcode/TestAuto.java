@@ -11,18 +11,18 @@ public class TestAuto extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         autohwp.init(hardwareMap);
         waitForStart();
-        autohwp.Leftfront.setTargetPosition(2000);
-        autohwp.Leftfront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        autohwp.Leftfront.setPower(0.5);
-        while (autohwp.Leftfront.isBusy()){
-            telemetry.addData("Target :",autohwp.Leftfront.getTargetPosition());
-            telemetry.addData("Current :",autohwp.Leftfront.getCurrentPosition());
+        autohwp.Base.setTargetPosition(-4000);
+        autohwp.Base.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        autohwp.Base.setPower(0.5);
+        while (autohwp.Base.isBusy()&&!autohwp.Left_touch.isPressed()){
+            telemetry.addData("Target :",autohwp.Base.getTargetPosition());
+            telemetry.addData("Current :",autohwp.Base.getCurrentPosition());
             telemetry.update();
         }
-        autohwp.Leftfront.setPower(0);
-        autohwp.Leftfront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        telemetry.addData("Target :",autohwp.Leftfront.getTargetPosition());
-        telemetry.addData("Current :",autohwp.Leftfront.getCurrentPosition());
+        autohwp.Base.setPower(0);
+        autohwp.Base.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        telemetry.addData("Target :",autohwp.Base.getTargetPosition());
+        telemetry.addData("Current :",autohwp.Base.getCurrentPosition());
         telemetry.update();
     }
 }
