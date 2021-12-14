@@ -24,14 +24,14 @@ public class CubeDetector extends OpenCvPipeline {
     private Location location;
 
     static final Rect LEFT_ROI = new Rect(
-            new Point(60, 330),
-            new Point(240, 460));
+            new Point(110, 330),
+            new Point(300, 560));
     static final Rect MIDDLE_ROI = new Rect(
-            new Point(580, 350),
-            new Point(710, 460));
+            new Point(560, 350),
+            new Point(700, 560));
     static final Rect RIGHT_ROI = new Rect(
-            new Point(1090, 330),
-            new Point(1280, 460));
+            new Point(950, 330),
+            new Point(1100, 560));
     static double PERCENT_COLOR_THRESHOLD = 0.3;
 
     public CubeDetector(Telemetry t) { telemetry = t; }
@@ -43,8 +43,8 @@ public class CubeDetector extends OpenCvPipeline {
         //contoursRemoveNoise(1);
 
         Imgproc.cvtColor(input, mat, Imgproc.COLOR_RGB2HSV);
-        Scalar lowHSV = new Scalar(23,70,70);
-        Scalar highHSV = new Scalar(34, 255, 255);
+        Scalar lowHSV = new Scalar(6,39,56);
+        Scalar highHSV = new Scalar(62, 255, 255);
 
         Core.inRange(mat, lowHSV, highHSV, mat);
 

@@ -11,10 +11,9 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
 
+@Autonomous(name = "Blueside_Right_Auto")
 
-@Autonomous(name = "Redside_Left_Auto")
-public class AutoRedsideLeft extends LinearOpMode {
-
+public class AutoBluesideRight extends LinearOpMode {
     OpenCvWebcam WebCam;
 
     Hardwaremap autohwp = new Hardwaremap();
@@ -69,10 +68,10 @@ public class AutoRedsideLeft extends LinearOpMode {
         //判断
         switch (detector.getLocation()) {
             case LEFT:
-                detectPosition=-2100;
+                detectPosition=-800;
                 break;
             case RIGHT:
-                detectPosition=-800;
+                detectPosition=-2100;
                 break;
             case MIDDLE:
                 detectPosition=-1400;
@@ -80,7 +79,7 @@ public class AutoRedsideLeft extends LinearOpMode {
         }
         WebCam.stopStreaming();
         // +左前，+右前，+右后，+左后为前行
-        encoderDrive_PlusElevator(DRIVE_SPEED,-24,24,-24,24,detectPosition,6);//左平移
+        encoderDrive_PlusElevator(DRIVE_SPEED,24,-24,24,-24,detectPosition,6);//左平移
         encoderDrive(1200,22,22,22,22,5);//前进
         sleep(200);
         autohwp.Claw.setPosition(0);
@@ -88,7 +87,7 @@ public class AutoRedsideLeft extends LinearOpMode {
         //放（第一次）
         encoderDrive(DRIVE_SPEED,-5,-5,-5,-5,5);
         encoderDrive_PlusElevator(DRIVE_SPEED,-16,-16,-16,-16,0,6);//后退
-        encoderDrive(DRIVE_SPEED,46,-46,46,-46,5);//左平移
+        encoderDrive(DRIVE_SPEED,-46,46,-46,46,5);//右平移
         //转转盘
         PanelRotation();
         encoderDrive(DRIVE_SPEED,22,22,22,22,5);
@@ -239,4 +238,3 @@ public class AutoRedsideLeft extends LinearOpMode {
         sleep(5000);
     }
 }
-

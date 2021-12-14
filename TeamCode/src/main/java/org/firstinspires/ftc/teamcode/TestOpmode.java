@@ -12,7 +12,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.hardware.UltrasonicSensor;
 
-@TeleOp(name = "OpmodeTest")
+//@TeleOp(name = "OpmodeTest")
 public class TestOpmode extends LinearOpMode {
 //0-136
    IrSeekerSensor irSeekerSensor;

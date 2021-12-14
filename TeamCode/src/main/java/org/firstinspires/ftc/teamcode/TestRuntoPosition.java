@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareDevice;
 import com.qualcomm.robotcore.hardware.HardwareDevice.Manufacturer;
 
-@Autonomous(name = "RuntoPositionTest")
+//@Autonomous(name = "RuntoPositionTest")
 public class TestRuntoPosition extends LinearOpMode {
 
     private DcMotor Base;

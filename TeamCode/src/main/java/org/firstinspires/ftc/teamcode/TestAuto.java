@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-@Autonomous(name = "TestAuto")
+//@Autonomous(name = "TestAuto")
 public class TestAuto extends LinearOpMode {
     Hardwaremap autohwp = new Hardwaremap();
     @Override

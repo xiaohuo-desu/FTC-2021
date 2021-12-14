@@ -138,10 +138,15 @@ public class Opmode_Player1plus2 extends LinearOpMode {
             }
 
             //转盘
-            while (gamepad2.y){
+            if (gamepad2.left_bumper){
                 telehwp.Rolling.setPower(1);
             }
-            telehwp.Rolling.setPower(0);
+            else if (gamepad2.right_bumper){
+                telehwp.Rolling.setPower(-1);
+            }
+            else {
+                telehwp.Rolling.setPower(0);
+            }
         }
     }
 
