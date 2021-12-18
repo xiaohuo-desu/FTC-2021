@@ -46,7 +46,7 @@ public class Opmode_Player1plus2 extends LinearOpMode {
 
         telehwp.init(hardwareMap);
 
-        telehwp.Claw.setPosition(0);
+        telehwp.Claw.setPosition(0.45);
         startPosition=telehwp.Claw.getPosition();
         Deltime=0;
 
@@ -94,10 +94,10 @@ public class Opmode_Player1plus2 extends LinearOpMode {
 
             //start+A键为gamepad1    start+B键为gamepad2
             //手柄中上拨为-1，下拨为1
-            M1= (-gamepad1.left_stick_y-gamepad1.left_stick_x-(gamepad1.right_stick_x/2))*MotorMaxspeed;
-            M2= (-gamepad1.left_stick_y+gamepad1.left_stick_x+(gamepad1.right_stick_x/2))*MotorMaxspeed;
-            M3= (-gamepad1.left_stick_y+gamepad1.left_stick_x-(gamepad1.right_stick_x/2))*MotorMaxspeed;
-            M4= (-gamepad1.left_stick_y-gamepad1.left_stick_x+(gamepad1.right_stick_x/2))*MotorMaxspeed;
+            M1= (-gamepad1.left_stick_y-(gamepad1.left_stick_x*0.9)-(gamepad1.right_stick_x/2))*MotorMaxspeed;
+            M2= (-gamepad1.left_stick_y+(gamepad1.left_stick_x*0.9)+(gamepad1.right_stick_x/2))*MotorMaxspeed;
+            M3= (-gamepad1.left_stick_y+(gamepad1.left_stick_x*0.9)-(gamepad1.right_stick_x/2))*MotorMaxspeed;
+            M4= (-gamepad1.left_stick_y-(gamepad1.left_stick_x*0.9)+(gamepad1.right_stick_x/2))*MotorMaxspeed;
 
             telehwp.Leftfront.setPower(M1);
             telehwp.Rightfront.setPower(M2);
@@ -125,15 +125,17 @@ public class Opmode_Player1plus2 extends LinearOpMode {
             }
 
             //抬升
+
             telehwp.Elevator.setPower(gamepad2.right_stick_y);
 
             //夹子
+
             if(isOpen&&gamepad2.a){
-                telehwp.Claw.setPosition(0);
+                telehwp.Claw.setPosition(0.6);
                 isOpen=false;
             }
             if(!isOpen&&gamepad2.b){
-                telehwp.Claw.setPosition(0.3);
+                telehwp.Claw.setPosition(0.45);
                 isOpen=true;
             }
 

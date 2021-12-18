@@ -54,6 +54,5 @@ public class Hardwaremap {
         Rolling.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         Base.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
     }
 }

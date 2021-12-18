@@ -12,21 +12,23 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.hardware.UltrasonicSensor;
 
-//@TeleOp(name = "OpmodeTest")
+@TeleOp(name = "OpmodeTest")
 public class TestOpmode extends LinearOpMode {
 //0-136
    IrSeekerSensor irSeekerSensor;
    UltrasonicSensor ultrasonicSensor;
-
+   Servo ser;
+   double degree;
     @Override
     public void runOpMode() throws InterruptedException {
-      irSeekerSensor=hardwareMap.get(IrSeekerSensor.class,"irs");
+      //irSeekerSensor=hardwareMap.get(IrSeekerSensor.class,"irs");
+      ser=hardwareMap.get(Servo.class,"Claw");
       //ultrasonicSensor=hardwareMap.get(UltrasonicSensor.class,"uls");
         waitForStart();
         while (opModeIsActive()){
-
-           telemetry.addData("Angle",irSeekerSensor.getAngle());
-            telemetry.addData("Address",irSeekerSensor.getI2cAddress());
+           degree=ser.getPosition();
+           telemetry.addData("Angle",degree);
+            //telemetry.addData("Address",irSeekerSensor.getI2cAddress());
            //telemetry.addData("Target",Base.getTargetPosition());
            telemetry.update();
         }

@@ -19,6 +19,8 @@ public class AutoRedsideLeft extends LinearOpMode {
 
     Hardwaremap autohwp = new Hardwaremap();
 
+    int distance;
+
     static final double COUNTS_PER_MOTOR_REV = 560;    // eg: TETRIX Motor Encoder
     static final double DRIVE_GEAR_REDUCTION = 1.0;     // This is < 1.0 if geared UP
     static final double WHEEL_DIAMETER_INCHES = 4;     // For figuring circumference
@@ -59,7 +61,7 @@ public class AutoRedsideLeft extends LinearOpMode {
             }
         });
 
-        autohwp.Claw.setPosition(0.3);
+        autohwp.Claw.setPosition(0.6);
         autohwp.Leftfront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         autohwp.Leftback.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         autohwp.Rightback.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -70,20 +72,23 @@ public class AutoRedsideLeft extends LinearOpMode {
         switch (detector.getLocation()) {
             case LEFT:
                 detectPosition=-2100;
+                distance=22;
                 break;
             case RIGHT:
                 detectPosition=-800;
+                distance=21;
                 break;
             case MIDDLE:
                 detectPosition=-1400;
+                distance=22;
                 break;
         }
         WebCam.stopStreaming();
         // +左前，+右前，+右后，+左后为前行
         encoderDrive_PlusElevator(DRIVE_SPEED,-24,24,-24,24,detectPosition,6);//左平移
-        encoderDrive(1200,22,22,22,22,5);//前进
+        encoderDrive(1200,distance,distance,distance,distance,5);//前进
         sleep(200);
-        autohwp.Claw.setPosition(0);
+        autohwp.Claw.setPosition(0.45);
         sleep(200);
         //放（第一次）
         encoderDrive(DRIVE_SPEED,-5,-5,-5,-5,5);
@@ -94,7 +99,7 @@ public class AutoRedsideLeft extends LinearOpMode {
         encoderDrive(DRIVE_SPEED,22,22,22,22,5);
     }
 
-    public void encoderDrive(double speed, double leftfrontInches, double rightfrontInches,double rightbackInches,double leftbackInches, double timeoutS) {
+    private void encoderDrive(double speed, double leftfrontInches, double rightfrontInches,double rightbackInches,double leftbackInches, double timeoutS) {
         int newLeftfrontTarget;
         int newLeftbackTarget;
         int newRightfrontTarget;
@@ -153,7 +158,7 @@ public class AutoRedsideLeft extends LinearOpMode {
         }
     }
 
-    public void encoderDrive_PlusElevator(double speed, double leftfrontInches, double rightfrontInches,double rightbackInches,double leftbackInches,int ElevatorPosition,double timeoutS) {
+    private void encoderDrive_PlusElevator(double speed, double leftfrontInches, double rightfrontInches,double rightbackInches,double leftbackInches,int ElevatorPosition,double timeoutS) {
         int newLeftfrontTarget;
         int newLeftbackTarget;
         int newRightfrontTarget;
@@ -183,7 +188,7 @@ public class AutoRedsideLeft extends LinearOpMode {
             autohwp.Leftback.setVelocity(Math.abs(speed));
             autohwp.Rightback.setVelocity(Math.abs(speed));
             autohwp.Elevator.setPower(1);
-            while (opModeIsActive() && autohwp.Leftfront.isBusy()&& autohwp.Leftback.isBusy() && autohwp.Rightback.isBusy() && autohwp.Rightfront.isBusy()||(autohwp.Elevator.isBusy()&&runtime.seconds() < timeoutS)) {
+            while (opModeIsActive() && ((autohwp.Leftfront.isBusy()&& autohwp.Leftback.isBusy() && autohwp.Rightback.isBusy() && autohwp.Rightfront.isBusy())||autohwp.Elevator.isBusy())&&runtime.seconds() < timeoutS) {
                 // Display it for the driver.
                 boolean IsRun=autohwp.Leftfront.isBusy()&& autohwp.Leftback.isBusy() && autohwp.Rightback.isBusy() && autohwp.Rightfront.isBusy();
                 boolean IsReach=autohwp.Elevator.isBusy();
@@ -199,9 +204,6 @@ public class AutoRedsideLeft extends LinearOpMode {
                 telemetry.addData("IsRun",IsRun);
                 telemetry.addData("IsReach",IsReach);
                 telemetry.update();
-            }
-            while (autohwp.Elevator.isBusy()){
-
             }
             // Stop all motion;
             autohwp.Elevator.setPower(0);

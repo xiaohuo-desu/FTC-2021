@@ -58,7 +58,7 @@ public class AutoBluesideRight extends LinearOpMode {
             }
         });
 
-        autohwp.Claw.setPosition(0.3);
+        autohwp.Claw.setPosition(0.6);
         autohwp.Leftfront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         autohwp.Leftback.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         autohwp.Rightback.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -82,15 +82,17 @@ public class AutoBluesideRight extends LinearOpMode {
         encoderDrive_PlusElevator(DRIVE_SPEED,24,-24,24,-24,detectPosition,6);//左平移
         encoderDrive(1200,22,22,22,22,5);//前进
         sleep(200);
-        autohwp.Claw.setPosition(0);
+        autohwp.Claw.setPosition(0.45);
         sleep(200);
         //放（第一次）
         encoderDrive(DRIVE_SPEED,-5,-5,-5,-5,5);
-        encoderDrive_PlusElevator(DRIVE_SPEED,-16,-16,-16,-16,0,6);//后退
-        encoderDrive(DRIVE_SPEED,-46,46,-46,46,5);//右平移
+        encoderDrive(DRIVE_SPEED,15,-15,-15,15,5);//左转
+        encoderDrive_PlusElevator(DRIVE_SPEED,19,-19,19,-19,0,5);//左平移
+        encoderDrive(DRIVE_SPEED,-45,-45,-45,-45,5);//后退
         //转转盘
         PanelRotation();
-        encoderDrive(DRIVE_SPEED,22,22,22,22,5);
+        encoderDrive(DRIVE_SPEED,-26,26,-26,26,5);//右平移
+        encoderDrive(1000,-2,-2,-2,-2,5);
     }
 
     public void encoderDrive(double speed, double leftfrontInches, double rightfrontInches,double rightbackInches,double leftbackInches, double timeoutS) {
@@ -182,11 +184,11 @@ public class AutoBluesideRight extends LinearOpMode {
             autohwp.Leftback.setVelocity(Math.abs(speed));
             autohwp.Rightback.setVelocity(Math.abs(speed));
             autohwp.Elevator.setPower(1);
-            while (opModeIsActive() && autohwp.Leftfront.isBusy()&& autohwp.Leftback.isBusy() && autohwp.Rightback.isBusy() && autohwp.Rightfront.isBusy()||(autohwp.Elevator.isBusy()&&runtime.seconds() < timeoutS)) {
+            while (opModeIsActive() && ((autohwp.Leftfront.isBusy()&& autohwp.Leftback.isBusy() && autohwp.Rightback.isBusy() && autohwp.Rightfront.isBusy())||autohwp.Elevator.isBusy())&&runtime.seconds() < timeoutS) {
                 // Display it for the driver.
-                boolean IsRun=autohwp.Leftfront.isBusy()&& autohwp.Leftback.isBusy() && autohwp.Rightback.isBusy() && autohwp.Rightfront.isBusy();
-                boolean IsReach=autohwp.Elevator.isBusy();
-                if (!autohwp.Leftfront.isBusy()&& !autohwp.Leftback.isBusy() && !autohwp.Rightback.isBusy() && !autohwp.Rightfront.isBusy()) {
+                boolean IsRun = autohwp.Leftfront.isBusy() && autohwp.Leftback.isBusy() && autohwp.Rightback.isBusy() && autohwp.Rightfront.isBusy();
+                boolean IsReach = autohwp.Elevator.isBusy();
+                if (!autohwp.Leftfront.isBusy() && !autohwp.Leftback.isBusy() && !autohwp.Rightback.isBusy() && !autohwp.Rightfront.isBusy()) {
                     autohwp.Leftfront.setPower(0);
                     autohwp.Leftback.setPower(0);
                     autohwp.Rightfront.setPower(0);
@@ -195,12 +197,9 @@ public class AutoBluesideRight extends LinearOpMode {
                 runtime.time();
                 telemetry.addData("Path1", autohwp.Leftfront.getTargetPosition());
                 telemetry.addData("Path2", autohwp.Leftfront.getCurrentPosition());
-                telemetry.addData("IsRun",IsRun);
-                telemetry.addData("IsReach",IsReach);
+                telemetry.addData("IsRun", IsRun);
+                telemetry.addData("IsReach", IsReach);
                 telemetry.update();
-            }
-            while (autohwp.Elevator.isBusy()){
-
             }
             // Stop all motion;
             autohwp.Elevator.setPower(0);
@@ -234,7 +233,7 @@ public class AutoBluesideRight extends LinearOpMode {
     }*/
 
     public void PanelRotation(){
-        autohwp.Rolling.setPower(-0.5);
+        autohwp.Rolling.setPower(0.5);
         sleep(5000);
     }
 }

@@ -24,6 +24,7 @@ public class AutoBluesideLeft extends LinearOpMode {
     static final double COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_INCHES * 3.1415);
     static final double DRIVE_SPEED = 1000;
 
+    int distance=0;
 
     ElapsedTime runtime = new ElapsedTime();
 
@@ -58,7 +59,7 @@ public class AutoBluesideLeft extends LinearOpMode {
             }
         });
 
-        autohwp.Claw.setPosition(0.3);
+        autohwp.Claw.setPosition(0.6);
         autohwp.Leftfront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         autohwp.Leftback.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         autohwp.Rightback.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -68,19 +69,21 @@ public class AutoBluesideLeft extends LinearOpMode {
         switch (detector.getLocation()) {
             case LEFT:
                 detectPosition=-2100;
+                distance=22;
                 break;
             case RIGHT:
                 detectPosition=-800;
+                distance=21;
                 break;
             case MIDDLE:
                 detectPosition=-1400;
+                distance=22;
                 break;
         }
         WebCam.stopStreaming();
         // +左前，+右前，+右后，+左后为前行
-        returnPosition(level.level3);
         encoderDrive_PlusElevator(DRIVE_SPEED,-24,24,-24,24,detectPosition,4);//右平移
-        encoderDrive(1000,22,22,22,22,5);//前进
+        encoderDrive(1000,distance,distance,distance,distance,5);//前进
         sleep(200);
         ClawDrive(touch.Put);
         sleep(100);
@@ -174,10 +177,10 @@ public class AutoBluesideLeft extends LinearOpMode {
     public void ClawDrive(touch touchstate ){
         switch (touchstate){
             case Put:
-                autohwp.Claw.setPosition(0.1);
+                autohwp.Claw.setPosition(0.45);
                 break;
             case Catch:
-                autohwp.Claw.setPosition(0.4);
+                autohwp.Claw.setPosition(0.6);
                 break;
         }
     }
@@ -213,7 +216,7 @@ public class AutoBluesideLeft extends LinearOpMode {
             autohwp.Leftback.setVelocity(Math.abs(speed));
             autohwp.Rightback.setVelocity(Math.abs(speed));
             autohwp.Base.setPower(1);
-            while (opModeIsActive() && autohwp.Leftfront.isBusy()&& autohwp.Leftback.isBusy() && autohwp.Rightback.isBusy() && autohwp.Rightfront.isBusy()||(autohwp.Base.isBusy()&&runtime.seconds()<timeoutS)) {
+            while (opModeIsActive() && ((autohwp.Leftfront.isBusy()&& autohwp.Leftback.isBusy() && autohwp.Rightback.isBusy() && autohwp.Rightfront.isBusy())||autohwp.Base.isBusy())&&runtime.seconds()<timeoutS) {
                 // Display it for the driver.
                 if (!autohwp.Leftfront.isBusy()&& !autohwp.Leftback.isBusy() && !autohwp.Rightback.isBusy() && !autohwp.Rightfront.isBusy()) {
                     autohwp.Leftfront.setPower(0);
@@ -224,9 +227,6 @@ public class AutoBluesideLeft extends LinearOpMode {
                 telemetry.addData("Path1", autohwp.Leftfront.getTargetPosition());
                 telemetry.addData("Path2", autohwp.Leftfront.getCurrentPosition());
                 telemetry.update();
-            }
-            while (autohwp.Base.isBusy()){
-
             }
             // Stop all motion;
             autohwp.Base.setPower(0);
@@ -274,7 +274,7 @@ public class AutoBluesideLeft extends LinearOpMode {
             autohwp.Leftback.setVelocity(Math.abs(speed));
             autohwp.Rightback.setVelocity(Math.abs(speed));
             autohwp.Elevator.setPower(1);
-            while (opModeIsActive() && autohwp.Leftfront.isBusy()&& autohwp.Leftback.isBusy() && autohwp.Rightback.isBusy() && autohwp.Rightfront.isBusy()||(autohwp.Elevator.isBusy()&&runtime.seconds()<timeoutS)) {
+            while (opModeIsActive() && ((autohwp.Leftfront.isBusy()&& autohwp.Leftback.isBusy() && autohwp.Rightback.isBusy() && autohwp.Rightfront.isBusy())||autohwp.Elevator.isBusy())&&runtime.seconds()<timeoutS) {
                 // Display it for the driver.
                 boolean IsRun=autohwp.Leftfront.isBusy()&& autohwp.Leftback.isBusy() && autohwp.Rightback.isBusy() && autohwp.Rightfront.isBusy();
                 boolean IsReach=autohwp.Elevator.isBusy();
@@ -289,9 +289,6 @@ public class AutoBluesideLeft extends LinearOpMode {
                 telemetry.addData("IsRun",IsRun);
                 telemetry.addData("IsReach",IsReach);
                 telemetry.update();
-            }
-            while (autohwp.Elevator.isBusy()){
-
             }
             // Stop all motion;
             autohwp.Elevator.setPower(0);
