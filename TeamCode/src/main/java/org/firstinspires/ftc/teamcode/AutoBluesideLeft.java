@@ -3,30 +3,28 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.robot.Robot;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.checkerframework.checker.propkey.qual.PropertyKeyBottom;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
 
-@Autonomous(name = "Redside_Right_Auto")
-public class AutoRedsideRight extends LinearOpMode {
+@Autonomous(name = "Blueside_Left_Auto")
 
+public class AutoBluesideLeft extends LinearOpMode {
     Hardwaremap autohwp = new Hardwaremap();
 
     OpenCvWebcam WebCam;
-
-    int distance=0;
 
     static final double COUNTS_PER_MOTOR_REV = 560;    // eg: TETRIX Motor Encoder
     static final double DRIVE_GEAR_REDUCTION = 1.0;     // This is < 1.0 if geared UP
     static final double WHEEL_DIAMETER_INCHES = 4;     // For figuring circumference
     static final double COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_INCHES * 3.1415);
-    static final double DRIVE_SPEED = 1200;
+    static final double DRIVE_SPEED = 1000;
+
+    int distance=0;
 
     ElapsedTime runtime = new ElapsedTime();
 
@@ -41,7 +39,6 @@ public class AutoRedsideRight extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         autohwp.init(hardwareMap);
-
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         WebCam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
 
@@ -61,77 +58,59 @@ public class AutoRedsideRight extends LinearOpMode {
                 telemetry.addData("Status","camera is not working");
             }
         });
+
         autohwp.Claw.setPosition(0.6);
         autohwp.Leftfront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         autohwp.Leftback.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         autohwp.Rightback.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         autohwp.Rightfront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
         waitForStart();
 
         switch (detector.getLocation()) {
             case LEFT:
-                detectPosition=-600;
+                detectPosition=-2100;
                 distance=22;
                 break;
             case RIGHT:
-                detectPosition=-2100;
-                distance=24;
+                detectPosition=-800;
+                distance=21;
                 break;
             case MIDDLE:
                 detectPosition=-1400;
-                distance=23;
+                distance=22;
                 break;
         }
         WebCam.stopStreaming();
         // +左前，+右前，+右后，+左后为前行
-        encoderDrive_PlusElevator(DRIVE_SPEED,24,-24,24,-24,detectPosition,5);//左平移
-        encoderDrive(1200,distance,distance,distance,distance,5);//前进
+        encoderDrive_PlusElevator(DRIVE_SPEED,-24,24,-24,24,detectPosition,4);//右平移
+        encoderDrive(1000,distance,distance,distance,distance,5);//前进
         sleep(200);
         ClawDrive(touch.Put);
-
-        sleep(400);
+        sleep(100);
         //倾倒（第一次）
         encoderDrive(DRIVE_SPEED,-8,-8,-8,-8,5);//后退
-        encoderDrive(DRIVE_SPEED,-15,15,15,-15,5);//右转
-        encoderDrive(DRIVE_SPEED,-19,19,-19,19,5);//右平移
+        encoderDrive(DRIVE_SPEED,15,-15,-15,15,5);//左转
+        encoderDrive(DRIVE_SPEED,19,-19,19,-19,5);//左平移
         encoderDrive_PlusElevator(1500,46,46,46,46,0,5);//前行
         //夹取
         encoderDrive(500,5,5,5,5,5);//前行
         ClawDrive(touch.Catch);
         sleep(200);
-        encoderDrive(300,-5,5,-5,5,5);
+        encoderDrive(300,5,-5,5,-5,5);
         sleep(200);
         encoderDrive(600,-15,-15,-15,-15,5);
 
-        encoderDrive_PlusElevator(1000,-36,-36,-36,-36,-1400,5);//后退
+        encoderDrive_PlusElevator(1000,-36,-36,-36,-36,-2100,5);//后退
 
-        encoderDrive_PlusBase(DRIVE_SPEED,23,-23,23,-23,-4000,5);//左平移
+        encoderDrive_PlusBase(1000,-23,23,-23,23,4000,5);//右平移
         ClawDrive(touch.Put);
         sleep(200);
 
-        encoderDrive_PlusBase(DRIVE_SPEED,-22,22,-22,21,0,5);//右平移
-        encoderDrive(300,-3,3,-3,3,5);
+        encoderDrive_PlusBase(DRIVE_SPEED,22,-22,22,-21,0,5);//左平移
+        encoderDrive(300,3,-3,3,-3,5);
         encoderDrive_PlusElevator(DRIVE_SPEED,48,48,48,48,0,5);//前行
-        encoderDrive(DRIVE_SPEED,10,-10,10,-10,5);//左平移
-//--------------------两次------------------------------//
-        /*encoderDrive(800,4,4,4,4,5);//前行
-        ClawDrive(touch.Catch);
-        sleep(200);
-        encoderDrive(300,-5,5,-5,5,5);
-        sleep(200);
-        encoderDrive(600,-10,-10,-10,-10,5);
+        encoderDrive(DRIVE_SPEED,-10,10,-10,10,5);//右平移
 
-
-        encoderDrive_PlusElevator(DRIVE_SPEED,-41,-41,-41,-41,-600);//后退
-
-        encoderDrive_PlusBase(2000,24,-24,24,-24,-4000);//左平移
-        ClawDrive(touch.Put);
-        sleep(200);
-
-        encoderDrive_PlusBase(DRIVE_SPEED,-23,23,-23,23,0);//左平移
-        encoderDrive(300,-3,3,-3,3,5);
-        encoderDrive_PlusElevator(2000,50,50,50,50,0);//前行*/
     }
 
     public void encoderDrive(double speed, double leftfrontInches, double rightfrontInches,double rightbackInches,double leftbackInches, double timeoutS) {
@@ -193,10 +172,12 @@ public class AutoRedsideRight extends LinearOpMode {
         }
     }
 
-    private void ClawDrive(touch touchstate ){
+    boolean TurnningOk=false;
+
+    public void ClawDrive(touch touchstate ){
         switch (touchstate){
             case Put:
-                autohwp.Claw.setPosition(0.45); //0.45
+                autohwp.Claw.setPosition(0.45);
                 break;
             case Catch:
                 autohwp.Claw.setPosition(0.6);
@@ -204,7 +185,7 @@ public class AutoRedsideRight extends LinearOpMode {
         }
     }
 
-    private void encoderDrive_PlusBase(double speed, double leftfrontInches, double rightfrontInches,double rightbackInches,double leftbackInches,int Baseposition,double timeoutS) {
+    public void encoderDrive_PlusBase(double speed, double leftfrontInches, double rightfrontInches,double rightbackInches,double leftbackInches,int Baseposition,double timeoutS) {
         int newLeftfrontTarget;
         int newLeftbackTarget;
         int newRightfrontTarget;
@@ -235,7 +216,7 @@ public class AutoRedsideRight extends LinearOpMode {
             autohwp.Leftback.setVelocity(Math.abs(speed));
             autohwp.Rightback.setVelocity(Math.abs(speed));
             autohwp.Base.setPower(1);
-            while (opModeIsActive() && ((autohwp.Leftfront.isBusy()&& autohwp.Leftback.isBusy()&&autohwp.Rightback.isBusy() && autohwp.Rightfront.isBusy())||autohwp.Base.isBusy())&&runtime.seconds() < timeoutS) {
+            while (opModeIsActive() && ((autohwp.Leftfront.isBusy()&& autohwp.Leftback.isBusy() && autohwp.Rightback.isBusy() && autohwp.Rightfront.isBusy())||autohwp.Base.isBusy())&&runtime.seconds()<timeoutS) {
                 // Display it for the driver.
                 if (!autohwp.Leftfront.isBusy()&& !autohwp.Leftback.isBusy() && !autohwp.Rightback.isBusy() && !autohwp.Rightfront.isBusy()) {
                     autohwp.Leftfront.setPower(0);
@@ -263,7 +244,7 @@ public class AutoRedsideRight extends LinearOpMode {
         }
     }
 
-    private void encoderDrive_PlusElevator(double speed, double leftfrontInches, double rightfrontInches,double rightbackInches,double leftbackInches,int ElevatorPosition,double timeoutS) {
+    public void encoderDrive_PlusElevator(double speed, double leftfrontInches, double rightfrontInches,double rightbackInches,double leftbackInches,int ElevatorPosition,double timeoutS) {
         int newLeftfrontTarget;
         int newLeftbackTarget;
         int newRightfrontTarget;
@@ -293,10 +274,10 @@ public class AutoRedsideRight extends LinearOpMode {
             autohwp.Leftback.setVelocity(Math.abs(speed));
             autohwp.Rightback.setVelocity(Math.abs(speed));
             autohwp.Elevator.setPower(1);
-            while (opModeIsActive() && ((autohwp.Leftfront.isBusy()&& autohwp.Leftback.isBusy() && autohwp.Rightback.isBusy() && autohwp.Rightfront.isBusy())||(autohwp.Elevator.isBusy())&&runtime.seconds() < timeoutS)) {
+            while (opModeIsActive() && ((autohwp.Leftfront.isBusy()&& autohwp.Leftback.isBusy() && autohwp.Rightback.isBusy() && autohwp.Rightfront.isBusy())||autohwp.Elevator.isBusy())&&runtime.seconds()<timeoutS) {
                 // Display it for the driver.
                 boolean IsRun=autohwp.Leftfront.isBusy()&& autohwp.Leftback.isBusy() && autohwp.Rightback.isBusy() && autohwp.Rightfront.isBusy();
-                boolean IsReach=autohwp.Elevator.isBusy()||runtime.seconds()<timeoutS;
+                boolean IsReach=autohwp.Elevator.isBusy();
                 if (!autohwp.Leftfront.isBusy()&& !autohwp.Leftback.isBusy() && !autohwp.Rightback.isBusy() && !autohwp.Rightfront.isBusy()) {
                     autohwp.Leftfront.setPower(0);
                     autohwp.Leftback.setPower(0);
@@ -338,7 +319,6 @@ public class AutoRedsideRight extends LinearOpMode {
                 detectPosition=-2100;
                 break;
         }
-        }
+    }
 }
-
 

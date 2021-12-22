@@ -3,30 +3,26 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.robot.Robot;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.checkerframework.checker.propkey.qual.PropertyKeyBottom;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
 
-@Autonomous(name = "Redside_Right_Auto")
-public class AutoRedsideRight extends LinearOpMode {
+@Autonomous(name = "Blueside_Right_Auto")
 
-    Hardwaremap autohwp = new Hardwaremap();
-
+public class AutoBluesideRight extends LinearOpMode {
     OpenCvWebcam WebCam;
 
-    int distance=0;
+    Hardwaremap autohwp = new Hardwaremap();
 
     static final double COUNTS_PER_MOTOR_REV = 560;    // eg: TETRIX Motor Encoder
     static final double DRIVE_GEAR_REDUCTION = 1.0;     // This is < 1.0 if geared UP
     static final double WHEEL_DIAMETER_INCHES = 4;     // For figuring circumference
     static final double COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_INCHES * 3.1415);
-    static final double DRIVE_SPEED = 1200;
+    static final double DRIVE_SPEED = 1000;
 
     ElapsedTime runtime = new ElapsedTime();
 
@@ -61,6 +57,7 @@ public class AutoRedsideRight extends LinearOpMode {
                 telemetry.addData("Status","camera is not working");
             }
         });
+
         autohwp.Claw.setPosition(0.6);
         autohwp.Leftfront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         autohwp.Leftback.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -68,70 +65,34 @@ public class AutoRedsideRight extends LinearOpMode {
         autohwp.Rightfront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         waitForStart();
-
+        //判断
         switch (detector.getLocation()) {
             case LEFT:
-                detectPosition=-600;
-                distance=22;
+                detectPosition=-800;
                 break;
             case RIGHT:
                 detectPosition=-2100;
-                distance=24;
                 break;
             case MIDDLE:
                 detectPosition=-1400;
-                distance=23;
                 break;
         }
         WebCam.stopStreaming();
         // +左前，+右前，+右后，+左后为前行
-        encoderDrive_PlusElevator(DRIVE_SPEED,24,-24,24,-24,detectPosition,5);//左平移
-        encoderDrive(1200,distance,distance,distance,distance,5);//前进
+        encoderDrive_PlusElevator(DRIVE_SPEED,24,-24,24,-24,detectPosition,6);//左平移
+        encoderDrive(1200,22,22,22,22,5);//前进
         sleep(200);
-        ClawDrive(touch.Put);
-
-        sleep(400);
-        //倾倒（第一次）
-        encoderDrive(DRIVE_SPEED,-8,-8,-8,-8,5);//后退
-        encoderDrive(DRIVE_SPEED,-15,15,15,-15,5);//右转
-        encoderDrive(DRIVE_SPEED,-19,19,-19,19,5);//右平移
-        encoderDrive_PlusElevator(1500,46,46,46,46,0,5);//前行
-        //夹取
-        encoderDrive(500,5,5,5,5,5);//前行
-        ClawDrive(touch.Catch);
+        autohwp.Claw.setPosition(0.45);
         sleep(200);
-        encoderDrive(300,-5,5,-5,5,5);
-        sleep(200);
-        encoderDrive(600,-15,-15,-15,-15,5);
-
-        encoderDrive_PlusElevator(1000,-36,-36,-36,-36,-1400,5);//后退
-
-        encoderDrive_PlusBase(DRIVE_SPEED,23,-23,23,-23,-4000,5);//左平移
-        ClawDrive(touch.Put);
-        sleep(200);
-
-        encoderDrive_PlusBase(DRIVE_SPEED,-22,22,-22,21,0,5);//右平移
-        encoderDrive(300,-3,3,-3,3,5);
-        encoderDrive_PlusElevator(DRIVE_SPEED,48,48,48,48,0,5);//前行
-        encoderDrive(DRIVE_SPEED,10,-10,10,-10,5);//左平移
-//--------------------两次------------------------------//
-        /*encoderDrive(800,4,4,4,4,5);//前行
-        ClawDrive(touch.Catch);
-        sleep(200);
-        encoderDrive(300,-5,5,-5,5,5);
-        sleep(200);
-        encoderDrive(600,-10,-10,-10,-10,5);
-
-
-        encoderDrive_PlusElevator(DRIVE_SPEED,-41,-41,-41,-41,-600);//后退
-
-        encoderDrive_PlusBase(2000,24,-24,24,-24,-4000);//左平移
-        ClawDrive(touch.Put);
-        sleep(200);
-
-        encoderDrive_PlusBase(DRIVE_SPEED,-23,23,-23,23,0);//左平移
-        encoderDrive(300,-3,3,-3,3,5);
-        encoderDrive_PlusElevator(2000,50,50,50,50,0);//前行*/
+        //放（第一次）
+        encoderDrive(DRIVE_SPEED,-5,-5,-5,-5,5);
+        encoderDrive(DRIVE_SPEED,15,-15,-15,15,5);//左转
+        encoderDrive_PlusElevator(DRIVE_SPEED,19,-19,19,-19,0,5);//左平移
+        encoderDrive(DRIVE_SPEED,-45,-45,-45,-45,5);//后退
+        //转转盘
+        PanelRotation();
+        encoderDrive(DRIVE_SPEED,-26,26,-26,26,5);//右平移
+        encoderDrive(1000,-2,-2,-2,-2,5);
     }
 
     public void encoderDrive(double speed, double leftfrontInches, double rightfrontInches,double rightbackInches,double leftbackInches, double timeoutS) {
@@ -193,77 +154,7 @@ public class AutoRedsideRight extends LinearOpMode {
         }
     }
 
-    private void ClawDrive(touch touchstate ){
-        switch (touchstate){
-            case Put:
-                autohwp.Claw.setPosition(0.45); //0.45
-                break;
-            case Catch:
-                autohwp.Claw.setPosition(0.6);
-                break;
-        }
-    }
-
-    private void encoderDrive_PlusBase(double speed, double leftfrontInches, double rightfrontInches,double rightbackInches,double leftbackInches,int Baseposition,double timeoutS) {
-        int newLeftfrontTarget;
-        int newLeftbackTarget;
-        int newRightfrontTarget;
-        int newRightbackTarget;
-        // Ensure that the opmode is still active
-        if (opModeIsActive()) {
-            // Determine new target position, and pass to motor controller
-            newLeftfrontTarget = autohwp.Leftfront.getCurrentPosition() + (int) (leftfrontInches * COUNTS_PER_INCH);
-            newLeftbackTarget = autohwp.Leftback.getCurrentPosition() + (int) (leftbackInches * COUNTS_PER_INCH);
-            newRightfrontTarget = autohwp.Rightfront.getCurrentPosition() + (int) (rightfrontInches * COUNTS_PER_INCH);
-            newRightbackTarget = autohwp.Rightback.getCurrentPosition() + (int) (rightbackInches * COUNTS_PER_INCH);
-            autohwp.Leftfront.setTargetPosition(newLeftfrontTarget);
-            autohwp.Leftback.setTargetPosition(newLeftbackTarget);
-            autohwp.Rightfront.setTargetPosition(newRightfrontTarget);
-            autohwp.Rightback.setTargetPosition(newRightbackTarget);
-            autohwp.Base.setTargetPosition(Baseposition);
-
-            // Turn On RUN_TO_POSITION
-            autohwp.Leftfront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            autohwp.Leftback.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            autohwp.Rightback.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            autohwp.Rightfront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            autohwp.Base.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            // reset the timeout time and start motion.
-            runtime.reset();
-            autohwp.Leftfront.setVelocity(Math.abs(speed));
-            autohwp.Rightfront.setVelocity(Math.abs(speed));
-            autohwp.Leftback.setVelocity(Math.abs(speed));
-            autohwp.Rightback.setVelocity(Math.abs(speed));
-            autohwp.Base.setPower(1);
-            while (opModeIsActive() && ((autohwp.Leftfront.isBusy()&& autohwp.Leftback.isBusy()&&autohwp.Rightback.isBusy() && autohwp.Rightfront.isBusy())||autohwp.Base.isBusy())&&runtime.seconds() < timeoutS) {
-                // Display it for the driver.
-                if (!autohwp.Leftfront.isBusy()&& !autohwp.Leftback.isBusy() && !autohwp.Rightback.isBusy() && !autohwp.Rightfront.isBusy()) {
-                    autohwp.Leftfront.setPower(0);
-                    autohwp.Leftback.setPower(0);
-                    autohwp.Rightfront.setPower(0);
-                    autohwp.Rightback.setPower(0);
-                }
-                telemetry.addData("Path1", autohwp.Leftfront.getTargetPosition());
-                telemetry.addData("Path2", autohwp.Leftfront.getCurrentPosition());
-                telemetry.update();
-            }
-            // Stop all motion;
-            autohwp.Base.setPower(0);
-            autohwp.Leftfront.setPower(0);
-            autohwp.Leftback.setPower(0);
-            autohwp.Rightfront.setPower(0);
-            autohwp.Rightback.setPower(0);
-            // Turn off RUN_TO_POSITION
-            autohwp.Leftfront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            autohwp.Leftback.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            autohwp.Rightback.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            autohwp.Rightfront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            autohwp.Base.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            sleep(50);   // optional pause after each move
-        }
-    }
-
-    private void encoderDrive_PlusElevator(double speed, double leftfrontInches, double rightfrontInches,double rightbackInches,double leftbackInches,int ElevatorPosition,double timeoutS) {
+    public void encoderDrive_PlusElevator(double speed, double leftfrontInches, double rightfrontInches,double rightbackInches,double leftbackInches,int ElevatorPosition,double timeoutS) {
         int newLeftfrontTarget;
         int newLeftbackTarget;
         int newRightfrontTarget;
@@ -293,20 +184,21 @@ public class AutoRedsideRight extends LinearOpMode {
             autohwp.Leftback.setVelocity(Math.abs(speed));
             autohwp.Rightback.setVelocity(Math.abs(speed));
             autohwp.Elevator.setPower(1);
-            while (opModeIsActive() && ((autohwp.Leftfront.isBusy()&& autohwp.Leftback.isBusy() && autohwp.Rightback.isBusy() && autohwp.Rightfront.isBusy())||(autohwp.Elevator.isBusy())&&runtime.seconds() < timeoutS)) {
+            while (opModeIsActive() && ((autohwp.Leftfront.isBusy()&& autohwp.Leftback.isBusy() && autohwp.Rightback.isBusy() && autohwp.Rightfront.isBusy())||autohwp.Elevator.isBusy())&&runtime.seconds() < timeoutS) {
                 // Display it for the driver.
-                boolean IsRun=autohwp.Leftfront.isBusy()&& autohwp.Leftback.isBusy() && autohwp.Rightback.isBusy() && autohwp.Rightfront.isBusy();
-                boolean IsReach=autohwp.Elevator.isBusy()||runtime.seconds()<timeoutS;
-                if (!autohwp.Leftfront.isBusy()&& !autohwp.Leftback.isBusy() && !autohwp.Rightback.isBusy() && !autohwp.Rightfront.isBusy()) {
+                boolean IsRun = autohwp.Leftfront.isBusy() && autohwp.Leftback.isBusy() && autohwp.Rightback.isBusy() && autohwp.Rightfront.isBusy();
+                boolean IsReach = autohwp.Elevator.isBusy();
+                if (!autohwp.Leftfront.isBusy() && !autohwp.Leftback.isBusy() && !autohwp.Rightback.isBusy() && !autohwp.Rightfront.isBusy()) {
                     autohwp.Leftfront.setPower(0);
                     autohwp.Leftback.setPower(0);
                     autohwp.Rightfront.setPower(0);
                     autohwp.Rightback.setPower(0);
                 }
+                runtime.time();
                 telemetry.addData("Path1", autohwp.Leftfront.getTargetPosition());
                 telemetry.addData("Path2", autohwp.Leftfront.getCurrentPosition());
-                telemetry.addData("IsRun",IsRun);
-                telemetry.addData("IsReach",IsReach);
+                telemetry.addData("IsRun", IsRun);
+                telemetry.addData("IsReach", IsReach);
                 telemetry.update();
             }
             // Stop all motion;
@@ -326,19 +218,22 @@ public class AutoRedsideRight extends LinearOpMode {
     }
 
     int detectPosition=0;
-    public void returnPosition(level detectlevel){
+    /*public void returnPosition(level detectlevel){
         switch (detectlevel){
             case level1:
-                detectPosition=-600;
+                detectPosition=-800;
                 break;
             case level2:
-                detectPosition=-1000;
+                detectPosition=-1400;
                 break;
             case level3:
                 detectPosition=-2100;
                 break;
         }
-        }
+    }*/
+
+    public void PanelRotation(){
+        autohwp.Rolling.setPower(0.5);
+        sleep(5000);
+    }
 }
-
-
