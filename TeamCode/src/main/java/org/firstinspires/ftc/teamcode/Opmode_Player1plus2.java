@@ -20,12 +20,10 @@ public class Opmode_Player1plus2 extends LinearOpMode {
 
     double M1,M2,M3,M4;
     double MotorMaxspeed=0.7;
-    double position=0.6;
     double startPosition;
 
     double Deltime;
 
-    boolean Isload=true;
     boolean isOpen;
 
     BNO055IMU               imu;
@@ -59,10 +57,10 @@ public class Opmode_Player1plus2 extends LinearOpMode {
 
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
 
-        parameters.mode                = BNO055IMU.SensorMode.IMU;
-        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
-        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        parameters.loggingEnabled      = false;
+        parameters.mode                = BNO055IMU.SensorMode.IMU;//断续器，一种传感器
+        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;//旋转角度
+        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;//加速度
+        parameters.loggingEnabled      = false;//日志记录
 
         // Retrieve and initialize the IMU. We expect the IMU to be attached to an I2C port
         // on a Core Device Interface Module, configured to be a sensor of type "AdaFruit IMU",
@@ -129,7 +127,7 @@ public class Opmode_Player1plus2 extends LinearOpMode {
             telehwp.Elevator.setPower(gamepad2.right_stick_y);
 
             //夹子
-
+            //&&和  ||或
             if(isOpen&&gamepad2.a){
                 telehwp.Claw.setPosition(0.6);
                 isOpen=false;
