@@ -129,11 +129,19 @@ public class Opmode_Player1plus2 extends LinearOpMode {
             //夹子
             //&&和  ||或
             if(isOpen&&gamepad2.a){
-                telehwp.Claw.setPosition(0.6);
+                telehwp.Claw.setPosition(0.58);
                 isOpen=false;
             }
+
+            //夹子模式1用于夹团队信物
             if(!isOpen&&gamepad2.b){
                 telehwp.Claw.setPosition(0.45);
+                isOpen=true;
+            }
+
+            //夹子模式2用于夹方块和球
+            if(!isOpen&&gamepad2.y){
+                telehwp.Claw.setPosition(0.52);
                 isOpen=true;
             }
 
